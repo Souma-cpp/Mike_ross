@@ -13,8 +13,8 @@ def health() -> dict:
         "app": settings.app_name,
         "environment": settings.environment,
         "keys_configured": {
-            "gemini": settings.gemini_api_key is not None,
-            "openai": settings.openai_api_key is not None,
-            "sarvam": settings.sarvam_api_key is not None,
+            "gemini": bool(settings.gemini_api_key),
+            "openai": bool(settings.openai_api_key),
+            "sarvam": bool(settings.sarvam_api_key),
         },
     }

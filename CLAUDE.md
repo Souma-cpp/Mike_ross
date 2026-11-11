@@ -85,7 +85,7 @@ BSA. Most datasets and LLM training data still use IPC numbers ("IPC 420").
   act + section. If retrieval finds nothing relevant, say so — never guess.
 - Clear disclaimer: legal information, not legal advice; serious matters need a
   lawyer or free legal aid (NALSA/DLSA).
-- Plain words; (from M4) answers in the user's language.
+- Plain words; answers in the user's language (once the multilingual stage lands).
 - Secrets (API keys) live in `.env`, never committed. Commit `.env.example`.
 
 ## 8. Decisions log
@@ -93,16 +93,23 @@ BSA. Most datasets and LLM training data still use IPC numbers ("IPC 420").
 - **Tenancy is West Bengal only** (West Bengal Premises Tenancy Act, 1997) —
   rent law is state law; deliberate scope choice, stated in the report.
 - **English-only for now.** Pipeline stays English internally; multilingual
-  (translate query in / answer out, Sarvam STT) is milestone M4.
-- **No LLM API keys yet.** Early milestones must run without a paid key.
+  (translate query in / answer out, Sarvam STT) is a later roadmap stage (docs/ROADMAP.md).
+- **Gemini API key now in use** (free tier) for embeddings. Anything that calls an API must still have an offline path or a fake in tests.
+- **V1 categories confirmed:** consumer (CPA 2019), RTI (RTI Act 2005),
+  WB tenancy, basic criminal/FIR rights (BNS, BNSS).
+- **Retrieval = semantic search** with Gemini embeddings (`gemini-embedding-2`,
+  768 dims), stdlib-only, no local model. Keyword (BM25) is only the offline
+  fallback. Chosen on eval data: semantic Hit@3 100% vs hybrid 81% vs keyword
+  43% on 21 layperson queries (`eval/run_eval.py`).
+- **First mentor presentation (17 Nov 2026):** live demo of query -> act +
+  section over CPA + RTI. Tagged `mentor-demo-2026-11-17` once merged.
 
 ## 9. Open questions (ask, don't assume)
 
 - Work split between teammates.
 - Main LLM: Gemini vs OpenAI vs Sarvam-105B.
-- Embedding model and vector DB.
-- V1 legal categories (proposed: consumer, RTI, WB tenancy, basic criminal/FIR)
-  and document types.
+- Vector DB, if the in-memory index stops being enough.
+- Document types beyond RTI application / consumer complaint / legal notice.
 - Hosting/deployment; web app only or also mobile.
 
 ## 10. How to work in this repo
@@ -110,5 +117,9 @@ BSA. Most datasets and LLM training data still use IPC numbers ("IPC 420").
 - Propose structure/plans and wait for OK before generating lots of code.
 - Small, runnable, testable steps.
 - Be direct: if an idea is bad, say so and why.
-- **Git:** never commit to `main`. Work on a branch, raise a PR, someone else
-  reviews and merges. **Ask before every commit and every push.**
+- **Git:** follow `CONTRIBUTING.md`. Never commit to `main`. Branches are
+  `<name>/<kebab-topic>` (e.g. `soumaditya/law-search-demo`), merged by PR
+  (squash) after the `tests` check passes. **Ask before every commit and every push.**
+- Use descriptive names everywhere (branches, commits, files, docs). No
+  internal codes like "M0"; roadmap stages are named in `docs/ROADMAP.md`.
+- Tests must run without API keys or PDFs (use fakes), so CI works for anyone.

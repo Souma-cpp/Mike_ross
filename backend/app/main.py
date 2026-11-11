@@ -16,5 +16,5 @@ DEMO_PAGE = Path(__file__).parent / "static" / "index.html"
 
 @app.get("/", include_in_schema=False)
 def demo_page() -> FileResponse:
-    """Single-page demo UI (temporary until the React frontend, M5)."""
+    """Single-page demo UI (temporary until the React frontend in frontend/ is built)."""
     return FileResponse(DEMO_PAGE)
