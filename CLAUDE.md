@@ -101,6 +101,19 @@ BSA. Most datasets and LLM training data still use IPC numbers ("IPC 420").
   768 dims), stdlib-only, no local model. Keyword (BM25) is only the offline
   fallback. Chosen on eval data: semantic Hit@3 100% vs hybrid 81% vs keyword
   43% on 21 layperson queries (`eval/run_eval.py`).
+- **Grounded guidance (`POST /ask`, `services/guidance.py`):** retrieve top 5
+  sections + per-act procedure "playbook" sections -> LLM returns structured
+  JSON citing S1..Sn -> `ground_check` removes statements with missing/invalid
+  citations or IPC mentions. Scope is judged by the LLM (`in_scope`), because
+  similarity scores could not separate in-scope from out-of-scope questions.
+  LLM: `gemini-3.5-flash` (thinkingLevel low), auto-fallback to
+  `gemini-3.5-flash-lite`; if both fail, return sections only.
+- **UI:** single page `backend/app/static/index.html` (no Node on the dev
+  laptop). A teammate is building a separate frontend; it should live in
+  `frontend/` and talk to the backend only through the API in `docs/API.md`.
+- **Known limitations:** retrieval favours CPA product-liability sections for
+  defective-goods questions; dataset has Acts only, not Rules/notifications
+  (e.g. District Commission money limits may have changed by Rules).
 - **First mentor presentation (17 Nov 2026):** live demo of query -> act +
   section over CPA + RTI. Tagged `mentor-demo-2026-11-17` once merged.
 

@@ -8,7 +8,7 @@ Status: **done** · **in progress** · **planned**
 | Backend skeleton | FastAPI app, settings from `.env`, `/health` | done |
 | Law dataset | CPA 2019 + RTI 2005 parsed into validated section records | done |
 | Law search | Plain-English query -> matching act + section; demo page; accuracy eval | done (mentor demo, 17 Nov 2026) |
-| Grounded answers | LLM explains the user's rights using **only** retrieved sections, with citations; says so when nothing relevant is found; disclaimer | planned |
+| Grounded answers | LLM explains the user's rights using **only** retrieved sections, with citations; says so when nothing relevant is found; disclaimer | done |
 | More acts + IPC->BNS mapping | WB Premises Tenancy Act 1997, BNS, BNSS; issue classification; IPC->BNS / CrPC->BNSS tables to correct outdated citations | planned |
 | Multilingual + voice | Hindi/Bengali/code-mixed input via Sarvam speech-to-text; answers in the user's language | planned |
 | Web frontend | React app with chat and in-browser voice recording (replaces the demo page) | planned |
