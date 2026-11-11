@@ -5,11 +5,17 @@ pydantic-settings reads each field from an env var of the same name
 before we have any API keys.
 """
 
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = BACKEND_DIR.parent
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # Absolute path, so scripts run from any folder still find backend/.env
+    model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", extra="ignore")
 
     app_name: str = "NyaySetu"
     environment: str = "dev"
@@ -18,6 +24,11 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = None
     openai_api_key: str | None = None
     sarvam_api_key: str | None = None
+
+    # Retrieval
+    embedding_model: str = "gemini-embedding-2"
+    embedding_dim: int = 768
+    index_path: Path = REPO_ROOT / "data" / "index" / "index.json"
 
 
 settings = Settings()
