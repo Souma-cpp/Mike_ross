@@ -44,6 +44,10 @@ class Retriever:
         self.chunks = data["chunks"]
         self.vectors = data["vectors"]
         self.bm25 = BM25([c["index_text"] for c in self.chunks])
+        # (act, section) -> its chunks in order, to rebuild a whole section's text
+        self.by_section: dict[tuple[str, str], list[dict]] = {}
+        for c in self.chunks:
+            self.by_section.setdefault((c["act"], c["section"]), []).append(c)
         self.embedder = (
             GeminiEmbedder(settings.gemini_api_key, data["model"], data["dim"], timeout=8)
             if settings.gemini_api_key
@@ -54,14 +58,31 @@ class Retriever:
     def _query_vector(self, query: str) -> tuple[float, ...]:
         return tuple(self.embedder.embed_query(query))
 
-    def _semantic_ranking(self, query: str) -> list[int]:
+    def _similarities(self, query: str) -> list[float]:
+        """Cosine similarity of the query with every chunk (vectors are unit length)."""
         q = self._query_vector(query)
-        sims = [sum(a * b for a, b in zip(q, v)) for v in self.vectors]
-        return _ranked(sims)
+        return [sum(a * b for a, b in zip(q, v)) for v in self.vectors]
+
+    def section(self, act: str, section: str) -> dict | None:
+        """Whole section (all its chunks joined), e.g. section("Consumer Protection Act", "69")."""
+        chunks = self.by_section.get((act, section))
+        if not chunks:
+            return None
+        c = chunks[0]
+        return {
+            "act": f"{c['act']}, {c['year']}",
+            "act_name": c["act"],
+            "section": c["section"],
+            "cite": c["section"],
+            "title": c["title"],
+            "chapter": c["chapter"],
+            "text": "\n".join(ch["text"] for ch in chunks),
+        }
 
     def search(self, query: str, k: int = 3, mode: str = "semantic") -> dict:
         """mode: 'hybrid' | 'semantic' | 'keyword'. Returns top-k SECTIONS."""
         rankings = []
+        sims: list[float] | None = None
         used = mode
         if mode in ("hybrid", "keyword"):
             rankings.append(_ranked(self.bm25.scores(query)))
@@ -69,7 +90,8 @@ class Retriever:
             try:
                 if not self.embedder:
                     raise RuntimeError("no GEMINI_API_KEY")
-                rankings.append(self._semantic_ranking(query))
+                sims = self._similarities(query)
+                rankings.append(_ranked(sims))
             except Exception as e:  # network down, quota, etc.
                 log.warning("embedding failed (%s); falling back to keyword search", e)
                 if mode == "semantic":
@@ -93,12 +115,15 @@ class Retriever:
             results.append(
                 {
                     "act": f"{c['act']}, {c['year']}",
+                    "act_name": c["act"],
                     "section": c["section"],
                     "cite": c["cite"],
                     "title": c["title"],
                     "chapter": c["chapter"],
                     "text": c["text"],
                     "score": round(fused[idx], 4),
+                    # raw cosine similarity (semantic modes only); used as a relevance gate
+                    "similarity": round(sims[idx], 4) if sims else None,
                 }
             )
             if len(results) == k:

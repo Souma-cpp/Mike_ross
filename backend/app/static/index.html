@@ -4,123 +4,402 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NyaySetu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f7f6f2; --card: #ffffff; --ink: #1d1d1f; --muted: #5f6368;
-    --line: #e3e1da; --accent: #1f4e79; --accent-soft: #e8eef5; --warn: #8a5a00; --warn-soft: #fff4dc;
+    --bg: #f8f6f1; --surface: #ffffff; --surface-2: #f2efe8; --ink: #1c2130; --muted: #5d6475;
+    --line: #e4e0d6; --primary: #26386b; --primary-ink: #ffffff; --primary-soft: #e9edf7;
+    --cpa: #26386b; --cpa-soft: #e9edf7; --rti: #0f6e69; --rti-soft: #e2f3f1;
+    --amber: #8a5300; --amber-soft: #fdf1dc; --amber-line: #f0d7a8;
+    --danger: #9b2c2c; --danger-soft: #fbe9e9; --ok: #1f6f43;
+    --shadow: 0 1px 2px rgba(28,33,48,.05), 0 6px 24px rgba(28,33,48,.06);
+    --radius: 14px;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141518; --card: #1d1f23; --ink: #ececec; --muted: #a0a4ab;
-      --line: #2e3138; --accent: #8ab4e0; --accent-soft: #22303f; --warn: #f0c36b; --warn-soft: #3a2f17;
+    :root:not([data-theme="light"]) {
+      --bg: #12141a; --surface: #1a1d25; --surface-2: #222632; --ink: #e8e9ee; --muted: #9ba1b0;
+      --line: #2c3040; --primary: #9db2f0; --primary-ink: #10131b; --primary-soft: #232c45;
+      --cpa: #9db2f0; --cpa-soft: #232c45; --rti: #6fd1c8; --rti-soft: #17322f;
+      --amber: #f2c46d; --amber-soft: #2e2615; --amber-line: #4a3b1c;
+      --danger: #f19999; --danger-soft: #3a1f1f; --ok: #7fd3a1;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.25);
     }
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
   body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 820px; margin: 0 auto; padding: 40px 16px 64px; }
-  h1 { margin: 0; font-size: 28px; letter-spacing: -0.01em; }
-  .tag { color: var(--muted); margin: 4px 0 28px; }
-  form { display: flex; gap: 8px; }
-  textarea { flex: 1; min-height: 76px; resize: vertical; padding: 12px 14px; font: inherit;
-             color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-  textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  button { padding: 0 20px; font: inherit; font-weight: 600; color: #fff; background: var(--accent);
-           border: 0; border-radius: 10px; cursor: pointer; }
-  @media (prefers-color-scheme: dark) { button { color: #111; } }
-  button:disabled { opacity: .6; cursor: wait; }
-  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 28px; }
-  .examples span { font-size: 13px; padding: 5px 10px; border-radius: 999px; cursor: pointer;
-                   background: var(--accent-soft); color: var(--accent); }
-  .status { color: var(--muted); font-size: 14px; margin-bottom: 12px; min-height: 1.2em; }
-  .status.warn { color: var(--warn); background: var(--warn-soft); padding: 8px 12px; border-radius: 8px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-          padding: 18px 20px; margin-bottom: 14px; }
-  .rank { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-  .cite { font-size: 19px; font-weight: 700; margin: 2px 0; }
-  .act { color: var(--accent); font-weight: 600; }
-  .meta { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
-  .text { white-space: pre-wrap; font-size: 14.5px; max-height: 7.5em; overflow: hidden; position: relative; }
-  .text.open { max-height: none; }
-  .more { font-size: 13px; color: var(--accent); cursor: pointer; margin-top: 6px; display: inline-block; }
-  footer { margin-top: 36px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
-  @media (max-width: 560px) { form { flex-direction: column; } button { padding: 12px; } }
+         font: 15.5px/1.6 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  h1, h2, h3 { font-family: Fraunces, Georgia, "Times New Roman", serif; letter-spacing: -0.01em; margin: 0; }
+  button { font: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+  /* Top bar */
+  header.top { border-bottom: 1px solid var(--line); background: var(--surface); }
+  header.top .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 700; color: var(--ink); text-decoration: none; }
+  .brand svg { color: var(--primary); }
+  .pill { font-size: 12px; font-weight: 500; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+  .top .spacer { flex: 1; }
+  .top .btn { white-space: nowrap; padding: 8px 14px; }
+  @media (max-width: 560px) { .top .pill { display: none; } }
+
+  /* Hero / ask box */
+  .hero { padding: 56px 0 28px; transition: padding .25s ease; }
+  .hero h1 { font-size: clamp(28px, 4.2vw, 44px); line-height: 1.15; max-width: 760px; }
+  .hero p.lead { color: var(--muted); font-size: 17px; max-width: 640px; margin: 14px 0 28px; }
+  body.has-result .hero { padding: 24px 0 8px; }
+  body.has-result .hero h1, body.has-result .hero p.lead, body.has-result .covers { display: none; }
+
+  .ask { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
+  .ask:focus-within { border-color: var(--primary); }
+  .ask textarea { width: 100%; min-height: 84px; border: 0; outline: 0; resize: vertical; background: transparent; color: var(--ink); font: inherit; font-size: 16.5px; padding: 6px 8px; }
+  body.has-result .ask textarea { min-height: 52px; }
+  .ask-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 4px 4px 0; }
+  .hint { color: var(--muted); font-size: 13px; flex: 1; min-width: 160px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 10px; padding: 10px 18px; font-weight: 600; cursor: pointer; background: var(--primary); color: var(--primary-ink); }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .55; cursor: progress; }
+  .btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+
+  .examples { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .examples .label { font-size: 13px; color: var(--muted); margin-right: 2px; }
+  .chip-ex { font-size: 13.5px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .chip-ex:hover { border-color: var(--primary); color: var(--primary); }
+  body.has-result .examples { display: none; }
+
+  .covers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 36px; }
+  .cover { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+  .cover .tag { margin-bottom: 8px; }
+  .cover p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  /* Tags & citation chips */
+  .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border-radius: 6px; padding: 2px 8px; }
+  .tag.cpa { background: var(--cpa-soft); color: var(--cpa); }
+  .tag.rti { background: var(--rti-soft); color: var(--rti); }
+  .cite { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; border-radius: 6px; padding: 1px 7px; margin-left: 4px; border: 0; cursor: pointer; vertical-align: 1px; white-space: nowrap; }
+  .cite.cpa { background: var(--cpa-soft); color: var(--cpa); }
+  .cite.rti { background: var(--rti-soft); color: var(--rti); }
+  .cite:hover { outline: 1px solid currentColor; }
+
+  /* Results layout */
+  #result { display: none; padding: 20px 0 48px; }
+  body.has-result #result { display: block; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .guidance { padding: 26px 28px; }
+  @media (max-width: 560px) { .guidance { padding: 20px 18px; } }
+  .g-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .g-head h2 { font-size: 22px; }
+  .badge-ok { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ok); font-weight: 600; }
+  .q-echo { color: var(--muted); font-size: 14px; margin: 2px 0 18px; font-style: italic; }
+  .sec { margin-top: 22px; }
+  .sec h3 { font-family: Inter, system-ui, sans-serif; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+  .situation { font-size: 16.5px; line-height: 1.65; margin: 0; }
+  ul.rights { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  ul.rights li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+  ul.rights li svg { color: var(--ok); margin-top: 3px; }
+  ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; display: grid; gap: 0; }
+  ol.steps li { counter-increment: s; position: relative; padding: 0 0 16px 44px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: -1px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; background: var(--primary-soft); color: var(--primary); }
+  ol.steps li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 30px; bottom: 2px; width: 1px; background: var(--line); }
+  .tip { display: inline-block; font-size: 11.5px; font-weight: 600; color: var(--muted); background: var(--surface-2); border-radius: 6px; padding: 1px 7px; margin-left: 6px; }
+  .deadlines { background: var(--amber-soft); border: 1px solid var(--amber-line); border-radius: 12px; padding: 14px 16px; }
+  .deadlines h3 { color: var(--amber); display: flex; gap: 8px; align-items: center; }
+  .deadlines ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  .disclaimer { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+  /* Sources */
+  .sources { position: sticky; top: 16px; }
+  .sources-head { padding: 18px 20px 6px; }
+  .sources-head h2 { font-size: 18px; }
+  .sources-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .src-list { padding: 8px 12px 14px; display: grid; gap: 8px; max-height: calc(100vh - 140px); overflow: auto; }
+  @media (max-width: 880px) { .sources { position: static; } .src-list { max-height: none; } }
+  .src { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface); transition: box-shadow .2s, border-color .2s; }
+  .src.flash { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .src .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .src .origin { font-size: 11.5px; color: var(--muted); }
+  .src h4 { margin: 6px 0 4px; font-size: 14.5px; font-weight: 600; }
+  .src .body { font-size: 13.5px; color: var(--muted); white-space: pre-wrap; max-height: 4.8em; overflow: hidden; }
+  .src.open .body { max-height: none; color: var(--ink); }
+  .src .more { background: none; border: 0; padding: 0; margin-top: 6px; color: var(--primary); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+  .also { margin: 8px 6px 0; font-size: 12.5px; color: var(--muted); }
+
+  /* States */
+  .notice { border-radius: 12px; padding: 14px 16px; font-size: 14.5px; margin-bottom: 16px; display: flex; gap: 10px; }
+  .notice.warn { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-line); }
+  .notice.err { background: var(--danger-soft); color: var(--danger); }
+  .oos { padding: 28px; }
+  .oos h2 { font-size: 22px; margin-bottom: 8px; }
+  .oos p { margin: 0 0 12px; }
+  .oos .help { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 14px; }
+
+  .progress { padding: 26px 28px; }
+  .stage { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14.5px; padding: 6px 0; }
+  .stage .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; }
+  .stage.active { color: var(--ink); }
+  .stage.active .dot { border-color: var(--primary); border-top-color: transparent; animation: spin .8s linear infinite; }
+  .stage.done { color: var(--ink); }
+  .stage.done .dot { border-color: var(--ok); background: var(--ok); }
+  .stage.done .dot::after { content: ""; width: 5px; height: 9px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+  .skel { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--surface-2), var(--line), var(--surface-2)); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin: 10px 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  footer.site { border-top: 1px solid var(--line); padding: 22px 0 36px; color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="NyaySetu home">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 18h20"/><path d="M4 18c0-6 3.6-10 8-10s8 4 8 10"/><path d="M8 18v-5"/><path d="M12 18V8"/><path d="M16 18v-5"/>
+      </svg>
+      NyaySetu
+    </a>
+    <span class="pill">Preview · Consumer &amp; RTI</span>
+    <span class="spacer"></span>
+    <button class="btn ghost" id="newq" type="button" hidden>New question</button>
+  </div>
+</header>
+
 <main>
-  <h1>NyaySetu</h1>
-  <p class="tag">Describe your problem in plain words. We find the law that applies.</p>
+  <section class="hero">
+    <div class="wrap">
+      <h1>Tell us what happened. We'll show you what the law says.</h1>
+      <p class="lead">Describe your problem in your own words. NyaySetu finds the sections of Indian law that apply and explains your rights and next steps, with every point linked to the law itself.</p>
 
-  <form id="f">
-    <textarea id="q" placeholder="e.g. I bought a phone online, it stopped working in a week and the seller won't replace it"></textarea>
-    <button id="go" type="submit">Search</button>
-  </form>
-  <div class="examples" id="ex"></div>
+      <form class="ask" id="form">
+        <label for="q" class="sr" style="position:absolute;left:-9999px">Your problem</label>
+        <textarea id="q" placeholder="e.g. I bought a phone online, it stopped working within a week and the seller refuses to replace it."></textarea>
+        <div class="ask-row">
+          <span class="hint">Press Enter to ask · Shift+Enter for a new line</span>
+          <button class="btn" id="go" type="submit">
+            Get guidance
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </form>
 
-  <div class="status" id="status"></div>
-  <div id="results"></div>
+      <div class="examples" id="examples"><span class="label">Try:</span></div>
 
-  <footer>
-    Covers: Consumer Protection Act, 2019 · Right to Information Act, 2005 (source: India Code).<br>
-    This is legal <b>information</b>, not legal advice. For serious matters, consult a lawyer or your
-    District Legal Services Authority (free legal aid, NALSA helpline 15100).
-  </footer>
+      <div class="covers">
+        <div class="cover">
+          <span class="tag cpa">Consumer Protection Act, 2019</span>
+          <p>Defective products, poor service, refunds, misleading ads, online shopping, where and how to complain.</p>
+        </div>
+        <div class="cover">
+          <span class="tag rti">Right to Information Act, 2005</span>
+          <p>Asking a government office for information, fees, deadlines, rejections and appeals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" aria-live="polite">
+    <div class="wrap" id="result-inner"></div>
+  </section>
 </main>
+
+<footer class="site">
+  <div class="wrap">
+    NyaySetu gives legal <strong>information</strong>, not legal advice. For serious matters, consult a lawyer or your
+    District Legal Services Authority. Free legal aid: NALSA helpline <strong>15100</strong>.
+    Law text from India Code (indiacode.nic.in).
+  </div>
+</footer>
 
 <script>
 const EXAMPLES = [
-  "The TV I bought caught fire. Can I claim compensation from the company?",
-  "Fake fairness cream advertised by a celebrity",
+  "My new phone stopped working in a week and the seller refuses to replace it",
+  "A celebrity is advertising a fake fairness cream",
   "I filed an RTI two months ago and got no reply",
-  "How long do I have to file a consumer complaint?",
+  "The officer rejected my RTI request. What can I do?",
 ];
-const $ = (id) => document.getElementById(id);
-const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const actClass = (act) => (act || "").startsWith("Right to Information") ? "rti" : "cpa";
+const actShort = (act) => actClass(act) === "rti" ? "RTI Act" : "Consumer Protection Act";
+const ICON_CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICON_CLOCK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 
 EXAMPLES.forEach((t) => {
-  const s = document.createElement("span");
-  s.textContent = t;
-  s.onclick = () => { $("q").value = t; run(); };
-  $("ex").appendChild(s);
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip-ex"; b.textContent = t;
+  b.onclick = () => { $("#q").value = t; ask(); };
+  $("#examples").appendChild(b);
 });
 
-$("f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
-$("q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); run(); } });
+$("#form").addEventListener("submit", (e) => { e.preventDefault(); ask(); });
+$("#q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); } });
+$("#newq").onclick = () => {
+  document.body.classList.remove("has-result");
+  $("#newq").hidden = true; $("#q").value = ""; $("#result-inner").innerHTML = ""; $("#q").focus();
+  window.scrollTo({ top: 0 });
+};
 
-async function run() {
-  const q = $("q").value.trim();
-  if (q.length < 3) return;
-  $("go").disabled = true;
-  $("status").className = "status";
-  $("status").textContent = "Searching…";
-  $("results").innerHTML = "";
-  const t0 = performance.now();
+let current = 0;
+
+// /?q=... runs a question straight away (handy for bookmarked demo questions).
+window.addEventListener("DOMContentLoaded", () => {
+  const preset = new URLSearchParams(location.search).get("q");
+  if (preset) { $("#q").value = preset; ask(); }
+});
+
+async function ask() {
+  const q = $("#q").value.trim();
+  if (q.length < 3) { $("#q").focus(); return; }
+  const run = ++current;
+  document.body.classList.add("has-result");
+  $("#newq").hidden = false;
+  $("#go").disabled = true;
+  renderProgress(q, 0);
+
+  // Two calls in parallel: /search is fast (shows progress honestly), /ask writes the guidance.
+  const searchP = fetch("/search?" + new URLSearchParams({ q, k: 5 })).then((r) => r.ok ? r.json() : null).catch(() => null);
+  const askP = fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q }) })
+    .then(async (r) => { if (!r.ok) throw new Error("Server returned " + r.status); return r.json(); });
+
+  searchP.then((s) => { if (run === current && s) renderProgress(q, 1, s.results.length); });
+
   try {
-    const res = await fetch("/search?" + new URLSearchParams({ q, k: 3 }));
-    if (!res.ok) throw new Error("Server returned " + res.status);
-    const data = await res.json();
-    const ms = Math.round(performance.now() - t0);
-    if (data.mode.includes("fallback")) {
-      $("status").className = "status warn";
-      $("status").textContent = `Offline mode: semantic search unavailable, showing keyword matches (${ms} ms).`;
-    } else {
-      $("status").textContent = `Top ${data.results.length} matching sections · ${ms} ms`;
-    }
-    $("results").innerHTML = data.results.map((r, i) => `
-      <div class="card">
-        <div class="rank">Match ${i + 1}</div>
-        <div class="cite">Section ${esc(r.cite)} — ${esc(r.title)}</div>
-        <div class="meta"><span class="act">${esc(r.act)}</span>${r.chapter ? " · Chapter " + esc(r.chapter) : ""}</div>
-        <div class="text">${esc(r.text)}</div>
-        <span class="more" onclick="this.previousElementSibling.classList.toggle('open'); this.textContent = this.textContent === 'Show full text' ? 'Show less' : 'Show full text'">Show full text</span>
-      </div>`).join("") || "<p>No matching sections found.</p>";
+    const data = await askP;
+    if (run !== current) return;
+    render(data);
   } catch (err) {
-    $("status").className = "status warn";
-    $("status").textContent = "Something went wrong: " + err.message;
+    if (run !== current) return;
+    $("#result-inner").innerHTML = `<div class="notice err">Something went wrong: ${esc(err.message)}. Is the server running?</div>`;
   } finally {
-    $("go").disabled = false;
+    if (run === current) $("#go").disabled = false;
   }
+}
+
+function renderProgress(q, stage, found) {
+  const stages = [
+    found ? `Found ${found} relevant sections of law` : "Finding the sections of law that match your problem",
+    "Writing plain-language guidance, citing each section",
+  ];
+  // stage 0: searching. stage 1: search done, guidance being written.
+  const state = (i) => (i < stage ? "done" : i === stage ? "active" : "");
+  const effective = stages.map((t, i) => `<div class="stage ${state(i)}"><span class="dot"></span>${esc(t)}</div>`).join("");
+  $("#result-inner").innerHTML = `
+    <div class="grid">
+      <div class="card progress">
+        <p class="q-echo" style="margin-top:0">“${esc(q)}”</p>
+        ${effective}
+        <div style="margin-top:18px"><div class="skel" style="width:92%"></div><div class="skel" style="width:78%"></div><div class="skel" style="width:85%"></div></div>
+      </div>
+      <div class="card sources"><div class="sources-head"><h2>The law behind this</h2><p>Loading sections…</p></div>
+        <div class="src-list"><div class="skel"></div><div class="skel" style="width:70%"></div></div></div>
+    </div>`;
+}
+
+function chips(ids, byId) {
+  return (ids || []).map((id) => {
+    const s = byId[id];
+    if (!s) return "";
+    return `<button type="button" class="cite ${actClass(s.act)}" data-src="${esc(id)}" title="${esc(actShort(s.act) + ", Section " + s.cite + " — " + s.title)}">§${esc(s.cite)}</button>`;
+  }).join("");
+}
+
+function sourceCard(s, cited) {
+  const origin = s.origin === "procedure" ? "How to act on it" : "Matches your problem";
+  return `
+    <article class="src" id="src-${esc(s.id)}">
+      <div class="meta"><span class="tag ${actClass(s.act)}">${esc(actShort(s.act))} · §${esc(s.cite)}</span><span class="origin">${origin}</span></div>
+      <h4>${esc(s.title)}</h4>
+      <div class="body">${esc(s.text)}</div>
+      <button type="button" class="more">Read full section</button>
+    </article>`;
+}
+
+function sourcesPanel(sources, citedIds) {
+  const cited = sources.filter((s) => citedIds.has(s.id));
+  const rest = sources.filter((s) => !citedIds.has(s.id));
+  const list = (cited.length ? cited : sources).map((s) => sourceCard(s)).join("");
+  const also = cited.length && rest.length
+    ? `<p class="also">Also checked: ${rest.map((s) => `${esc(actShort(s.act))} §${esc(s.cite)}`).join(", ")}</p>` : "";
+  return `
+    <aside class="card sources">
+      <div class="sources-head"><h2>The law behind this</h2>
+        <p>${cited.length ? "Sections cited in the guidance. Click a § chip to jump here." : "The most relevant sections we found."}</p></div>
+      <div class="src-list">${list}${also}</div>
+    </aside>`;
+}
+
+function render(d) {
+  const byId = Object.fromEntries((d.sources || []).map((s) => [s.id, s]));
+
+  if (d.status === "out_of_scope") {
+    $("#result-inner").innerHTML = `
+      <div class="card oos">
+        <h2>That's outside what NyaySetu covers yet</h2>
+        <p>${esc(d.message)}</p>
+        <div class="help"><strong>Need help now?</strong> Call the NALSA free legal aid helpline <strong>15100</strong>,
+        or visit your District Legal Services Authority (DLSA). They provide free legal help to eligible people.</div>
+      </div>`;
+    return;
+  }
+
+  if (d.status === "sections_only" || !d.answer) {
+    $("#result-inner").innerHTML = `
+      <div class="notice warn">${esc(d.message || "Showing the relevant sections.")}</div>
+      <div class="grid"><div class="card guidance"><p class="q-echo" style="margin:0">“${esc(d.query)}”</p>
+      <p style="margin:12px 0 0">These sections of law look most relevant to your problem. Open a section on the right to read it in full.</p></div>
+      ${sourcesPanel(d.sources, new Set())}</div>`;
+    wire();
+    return;
+  }
+
+  const a = d.answer;
+  const citedIds = new Set();
+  const collect = (x) => (x?.citations || []).forEach((c) => citedIds.add(c));
+  [a.situation, ...a.rights, ...a.steps, ...a.deadlines].forEach(collect);
+
+  const total = d.checks ? d.checks.kept : 0;
+  const badge = `<span class="badge-ok" title="Every legal statement links to a section of the law; unsupported statements are removed automatically.">${ICON_CHECK} ${total} statements, each linked to the law</span>`;
+
+  const situation = a.situation ? `<div class="sec"><h3>Your situation</h3><p class="situation">${esc(a.situation.text)}${chips(a.situation.citations, byId)}</p></div>` : "";
+  const rights = a.rights.length ? `<div class="sec"><h3>Your rights</h3><ul class="rights">${a.rights.map((r) => `<li>${ICON_CHECK}<span>${esc(r.text)}${chips(r.citations, byId)}</span></li>`).join("")}</ul></div>` : "";
+  const steps = a.steps.length ? `<div class="sec"><h3>What you can do</h3><ol class="steps">${a.steps.map((s) => `<li>${esc(s.text)}${s.general_tip ? '<span class="tip">Practical tip</span>' : ""}${chips(s.citations, byId)}</li>`).join("")}</ol></div>` : "";
+  const deadlines = a.deadlines.length ? `<div class="sec deadlines"><h3>${ICON_CLOCK} Deadlines</h3><ul>${a.deadlines.map((x) => `<li>${esc(x.text)}${chips(x.citations, byId)}</li>`).join("")}</ul></div>` : "";
+
+  $("#result-inner").innerHTML = `
+    ${d.search_mode && d.search_mode.includes("fallback") ? '<div class="notice warn">Offline search mode: results may be less precise.</div>' : ""}
+    <div class="grid">
+      <article class="card guidance">
+        <div class="g-head"><h2>Guidance</h2>${badge}</div>
+        <p class="q-echo">“${esc(d.query)}”</p>
+        ${situation}${rights}${steps}${deadlines}
+        <p class="disclaimer">This is legal information based on the sections shown, not legal advice. For serious matters, talk to a lawyer
+        or your District Legal Services Authority (free legal aid, NALSA helpline 15100).</p>
+      </article>
+      ${sourcesPanel(d.sources, citedIds)}
+    </div>`;
+  wire();
+}
+
+function wire() {
+  document.querySelectorAll(".src .more").forEach((b) => b.onclick = () => {
+    const card = b.closest(".src");
+    card.classList.toggle("open");
+    b.textContent = card.classList.contains("open") ? "Show less" : "Read full section";
+  });
+  document.querySelectorAll(".cite").forEach((c) => c.onclick = () => {
+    const el = document.getElementById("src-" + c.dataset.src);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("flash", "open");
+    const more = el.querySelector(".more"); if (more) more.textContent = "Show less";
+    setTimeout(() => el.classList.remove("flash"), 1600);
+  });
 }
 </script>
 </body>

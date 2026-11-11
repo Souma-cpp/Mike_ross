@@ -30,5 +30,9 @@ class Settings(BaseSettings):
     embedding_dim: int = 768
     index_path: Path = REPO_ROOT / "data" / "index" / "index.json"
 
+    # Guidance (LLM). The fallback is used if the main model is slow or fails.
+    llm_model: str = "gemini-3.5-flash"
+    llm_fallback_model: str = "gemini-3.5-flash-lite"
+
 
 settings = Settings()

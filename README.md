@@ -13,9 +13,13 @@ Final-year B.Tech CSE project, Sister Nivedita University (2027 batch).
 
 - **Law dataset:** Consumer Protection Act 2019 (107 sections) and RTI Act 2005
   (31 sections), parsed from India Code PDFs into one validated record per section.
-- **Law search:** type a problem in plain English and get the top matching
-  sections (act + section + text). Semantic search with Gemini embeddings;
-  keyword search as an offline fallback.
+- **Grounded guidance:** type a problem in plain English and get structured
+  guidance (your situation, your rights, what to do, deadlines). Every legal
+  statement cites a section that was actually retrieved; uncited statements are
+  removed automatically. Out-of-scope questions are recognised and pointed to
+  free legal aid. (`POST /ask`)
+- **Law search:** the top matching sections for a problem (`GET /search`).
+  Semantic search with Gemini embeddings; keyword search as an offline fallback.
 - **Accuracy check:** 21 everyday-language test queries; the right section is in
   the top 3 for all of them (`eval/run_eval.py`).
 
@@ -55,9 +59,9 @@ backend/.venv/bin/python eval/run_eval.py -v   # measure search accuracy
 |---|---|
 | `backend/app/main.py` | FastAPI app: registers routes, serves the demo page |
 | `backend/app/config.py` | Settings and API keys, read from `backend/.env` |
-| `backend/app/api/` | HTTP routes only (`/health`, `/search`). Thin: they call services |
-| `backend/app/services/` | The actual logic: chunking, embeddings, keyword search, retriever |
-| `backend/app/static/` | Temporary single-page demo UI |
+| `backend/app/api/` | HTTP routes only (`/health`, `/search`, `/ask`). Thin: they call services |
+| `backend/app/services/` | The actual logic: chunking, embeddings, keyword search, retriever, LLM client, guidance |
+| `backend/app/static/` | Single-page web UI (until the React frontend). `/?q=...` runs a question directly |
 | `backend/tests/` | Automated tests; run on every pull request |
 | `ingest/` | Offline data pipeline: PDF -> sections (`parse_act.py`), sections -> search index (`build_index.py`) |
 | `data/raw/` | Source PDFs from India Code (not in git; download yourself) |
@@ -66,7 +70,7 @@ backend/.venv/bin/python eval/run_eval.py -v   # measure search accuracy
 | `data/mappings/` | Lookup tables, e.g. IPC -> BNS (planned) |
 | `eval/` | Test queries with expected sections + the accuracy script |
 | `frontend/` | React app (planned) |
-| `docs/` | Roadmap and design notes |
+| `docs/` | Roadmap (`ROADMAP.md`) and the API contract for frontend work (`API.md`) |
 
 ## Contributing
 
